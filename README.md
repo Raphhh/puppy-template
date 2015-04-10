@@ -12,6 +12,12 @@ Template module for Puppy framework.
 
 See [Puppy framework](https://github.com/Raphhh/puppy) for more information.
 
+## Installation
+
+```
+$ composer require raphhh/puppy-template
+```
+
 ## Documentation
 
 Service for Twig_Environment. See [Twig](http://twig.sensiolabs.org/) for more information.
