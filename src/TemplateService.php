@@ -14,11 +14,6 @@ use Twig_Loader_Filesystem;
 class TemplateService
 {
     /**
-     * @var Twig_Environment
-     */
-    private $twig;
-
-    /**
      * @var Twig_ExtensionInterface[]
      */
     private $extensions;
@@ -41,7 +36,12 @@ class TemplateService
         if (empty($services['config'])) {
             throw new \InvalidArgumentException('Service "config" not found');
         }
-        return $this->buildTwig($services['config'])->initExtensions()->twig;
+        $this->validConfig($services['config']);
+
+        $twig = $this->buildTwig($services['config']);
+        $this->initExtensions($twig);
+
+        return $twig;
     }
 
     /**
@@ -65,13 +65,11 @@ class TemplateService
 
     /**
      * @param \ArrayAccess $config
-     * @return $this
+     * @return Twig_Environment
      */
     private function buildTwig(\ArrayAccess $config)
     {
-        $this->validConfig($config);
-
-        $this->twig = new Twig_Environment(
+        return new Twig_Environment(
             new Twig_Loader_Filesystem($config['template.directory.main']),
             array(
                 'cache' => $config['template.directory.cache'],
@@ -79,20 +77,19 @@ class TemplateService
                 'strict_variables' => true,
             )
         );
-
-        return $this;
     }
 
     /**
-     * @return $this
+     * @param Twig_Environment $twig
+     * @return Twig_Environment
      */
-    private function initExtensions()
+    private function initExtensions(Twig_Environment $twig)
     {
-        $this->twig->addExtension(new Twig_Extension_Debug());
+        $twig->addExtension(new Twig_Extension_Debug());
         foreach($this->getExtensions() as $extensions){
-            $this->twig->addExtension($extensions);
+            $twig->addExtension($extensions);
         }
-        return $this;
+        return $twig;
     }
 
     /**
